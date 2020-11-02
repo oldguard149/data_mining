@@ -107,3 +107,15 @@ body {
   margin: 0 auto;
   grid-column: span 2;
 }
+
+#info {
+  padding: 2rem;
+}
+
+#info li {
+  padding: 0.25rem;
+}
+
+#info ul {
+  padding-left: 1rem;
+}

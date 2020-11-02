@@ -1,6 +1,9 @@
 var express = require('express');
+const { DefaultSerializer } = require('v8');
 var router = express.Router();
 const spawn = require('child_process').spawn;
+const mockData = require('../lib/deseasedata.json');
+
 
 const className = ['2-4-d-injury', 'alternarialeaf-spot', 'anthracnose',
   'bacterial-blight', 'bacterial-pustule', 'brown-spot',
@@ -33,16 +36,34 @@ router.post('/', async (req, res) => {
     var process = spawn('python', ["ml_model/script.py", ...formData]);
     const result = [];
     for await (const data of process.stdout) {
-      console.log(`stdout from the child: ${data}`);
+      // console.log(`stdout from the child: ${data}`);
       result.push(data.toString());
     };
 
     const desease = className[parseInt(result[0])];
-    res.render('result', { desease });
+    res.redirect(`/result/${desease}`);
   } catch (error) {
     console.log(error);
     res.render('error', { message: "Server error!", error });
   }
 });
+
+router.get('/result/:name', (req, res) => {
+  const desease = req.params.name;
+  if (isValidDesease(desease)) {
+    const data = mockData[desease];
+    res.render('result', { data, desease });
+  } else {
+    res.redirect('/');
+  }
+});
+
+function isValidDesease(deseaseName) {
+  const checker = className.filter(name => name === deseaseName);
+  if (checker.length === 1) {
+    return true;
+  }
+  return false;
+}
 
 module.exports = router;
