@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home page</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/stylesheets/csv-upload.css" />
+</head>
+
+<body>
+    <div id="wrap">
+        <div id="form">
+            <h2>Upload your csv file and get predict</h2>
+            <% if ('undefined' !== typeof filesizeError && filesizeError) {%>
+                <div class="alert">
+                    <p id="error-filesize">File too large, only csv file with size smaller than 2MB is available.</p>
+                </div>
+            <% } %>
+            <div id="form-container">
+                <form method="post" enctype="multipart/form-data">
+                    <div style="margin: auto;">
+                        <label for="">Csv File:</label>
+                        <input type="file" name="csv" required>
+                    </div>
+                    <input class="submit-button" type="submit" value="Upload">
+                </form>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

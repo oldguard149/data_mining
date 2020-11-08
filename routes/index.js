@@ -1,51 +1,21 @@
-var express = require('express');
-const { DefaultSerializer } = require('v8');
-var router = express.Router();
-const spawn = require('child_process').spawn;
+const express = require('express');
+const router = express.Router();
+const fs = require('fs');
+const csv = require('fast-csv');
+const path = require('path');
+const { Parser } = require('json2csv');
+
 const mockData = require('../lib/deseasedata.json');
+const upload = require('../lib/upload_file');
+const csvUpload = upload.single('csv');
+const { isValidDesease, getFileName, handleUploadFile, getPredictClass } = require('../lib/helper');
+const { bodyName, csvFields } = require('../lib/helper_data');
 
 
-const className = ['2-4-d-injury', 'alternarialeaf-spot', 'anthracnose',
-  'bacterial-blight', 'bacterial-pustule', 'brown-spot',
-  'brown-stem-rot', 'charcoal-rot', 'cyst-nematode',
-  'diaporthe-pod-&-stem-blight', 'diaporthe-stem-canker',
-  'downy-mildew', 'frog-eye-leaf-spot', 'herbicide-injury',
-  'phyllosticta-leaf-spot', 'phytophthora-rot', 'powdery-mildew',
-  'purple-seed-stain', 'rhizoctonia-root-rot'];
-
-const bodyName = ['date', 'plant-stand', 'precip', 'temp', 'hail', 'crop-hist',
-  'area-damaged', 'severity', 'seed-tmt', 'germination', 'plant-growth', 'leaves',
-  'leafspots-halo', 'leafspots-marg', 'leafspot-size', 'leaf-shread', 'leaf-malf',
-  'leaf-mild', 'stem', 'lodging', 'stem-cankers', 'canker-lesion', 'fruiting-bodies',
-  'external-decay', 'mycelium', 'int-discolor', 'sclerotina', 'fruit-pods', 'fruit-spots',
-  'seed', 'mold-growth', 'seed-discolor', 'seed-size', 'shriveling', 'roots'];
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', function (req, res) {
   res.render('index');
-});
-
-router.post('/', async (req, res) => {
-  try {
-    const formData = [];
-    bodyName.forEach(value => {
-      formData.push(req.body[value]);
-    })
-
-    // path of python and model is looked up from app.js directory position
-    var process = spawn('python', ["ml_model/script.py", ...formData]);
-    const result = [];
-    for await (const data of process.stdout) {
-      // console.log(`stdout from the child: ${data}`);
-      result.push(data.toString());
-    };
-
-    const desease = className[parseInt(result[0])];
-    res.redirect(`/result/${desease}`);
-  } catch (error) {
-    console.log(error);
-    res.render('error', { message: "Server error!", error });
-  }
 });
 
 router.get('/result/:name', (req, res) => {
@@ -58,12 +28,80 @@ router.get('/result/:name', (req, res) => {
   }
 });
 
-function isValidDesease(deseaseName) {
-  const checker = className.filter(name => name === deseaseName);
-  if (checker.length === 1) {
-    return true;
+router.get('/upload-csv', (req, res) => {
+  res.render('upload-csv');
+});
+
+router.post('/', async (req, res) => {
+  try {
+    const formData = [];
+    bodyName.forEach(value => {
+      formData.push(req.body[value]);
+    })
+
+    // path of python and model is looked up from app.js directory position
+    const desease = await getPredictClass("ml_model/script.py", formData)
+    res.redirect(`/result/${desease}`);
+  } catch (error) {
+    console.log(error);
+    res.render('error', { message: "Server error!", error });
   }
-  return false;
-}
+});
+
+
+router.post('/upload-csv', (req, res) => {
+  csvUpload(req, res, (err) => {
+    if (err) { // this error occure when upload file
+      if (err.code === "LIMIT_FILE_SIZE") {
+        res.render('upload-csv', {filesizeError: true});
+      }
+    } else {
+      try {
+        const clientCsvFilePath = path.resolve(__dirname, req.file.filename);
+        const resultCsvFileName = getFileName();
+        const resultFilePath = path.resolve(__dirname, 'resultdata', resultCsvFileName);
+
+        // read upload csv file, get predict for each record and then save data to file named resultCsvFileName
+        handleUploadFile(req, res, clientCsvFilePath, resultFilePath, resultCsvFileName);
+
+        // delete upload file
+        fs.unlinkSync(clientCsvFilePath); 
+      } catch (error) {
+        console.log(error);
+        res.send('error');
+      }
+    }
+  }); // end of csvUpload
+});
+
+router.get('/download/:filename', (req, res) => {
+  try {
+    const fileRows = [];
+    const fields = csvFields;
+    const fileName = req.params.filename;
+
+    const resquestFilePath = path.resolve(__dirname, 'resultdata', fileName);
+    fs.access(resquestFilePath, (err) => {
+      if (err) {
+        res.status(404).send('File not found');
+      } else {
+        fs.createReadStream(resquestFilePath)
+          .pipe(csv.parse({ headers: true }))
+          .on('data', data => {
+            fileRows.push(data);
+          })
+          .on('end', () => {
+            const json2csv = new Parser({ fields: fields });
+            const csvData = json2csv.parse(fileRows);
+            res.attachment('data.csv');
+            res.status(200).send(csvData);
+          });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.send('error')
+  }
+});
 
 module.exports = router;

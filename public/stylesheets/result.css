@@ -41,11 +41,36 @@
     padding-left: 1rem;
 }
 
-/* #info {
-  display: flex;
-  flex-direction: column;
+#countdown-time {
+  text-align: center;
 }
 
-#info > * {
+#main form {
+  margin: 1rem 0 2rem 0;
+}
+
+#download-button {
+  padding: 1rem;
+  display: flex;
   margin: auto;
-} */
+  border-radius: 0.3rem;
+}
+
+
+.btnEnable {
+  background-color:#E6F9D2;
+  border:1px solid #97DE4C;
+  color:#232323;
+  cursor: pointer;
+}
+
+.btnDisable {
+  background-color:#FCBABA;
+  border:1px solid #DD3939;
+  color:#232323;
+  cursor: wait;
+}
+
+h2 {
+  padding: 1rem;
+}
