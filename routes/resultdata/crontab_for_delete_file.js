@@ -2,7 +2,7 @@ const CronJob = require('cron').CronJob;
 const fs = require('fs');
 const path = require('path');
 
-const job = new CronJob('0 */15 * * * *', function () {
+const job = new CronJob('0 */10 * * * *', function () {
     console.log(Date())
     console.log('check result csv file for delete');
     fs.readdirSync(__dirname)
