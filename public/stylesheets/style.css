@@ -18,8 +18,8 @@ body {
   margin-left: auto;
   margin-right: auto;
   display: grid;
-  grid-template-areas: "main" "footer";
-  grid-template-rows:  auto 40px;
+  grid-template-areas: "topnav" "main" "footer";
+  grid-template-rows:  min-content auto 40px;
   box-shadow: 15px 15px 15px rgba(0, 0, 0, 0.10);
   height: max-content;
   min-height: 100vh;

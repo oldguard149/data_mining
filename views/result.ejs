@@ -4,10 +4,12 @@
 <head>
     <title>Home page</title>
     <link rel='stylesheet' href='/stylesheets/result.css' />
+    <link rel="stylesheet" href="/stylesheets/topnav.css">
 </head>
 
 <body>
     <div id="wrap">
+        <%- include('topnav') %>
         <div id="main" >
             <h2>Base on your information, the desease is predicted as <%= desease %></h2>
             <div id="info">

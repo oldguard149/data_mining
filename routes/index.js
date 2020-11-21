@@ -8,7 +8,7 @@ const { Parser } = require('json2csv');
 const mockData = require('../lib/deseasedata.json');
 const upload = require('../lib/upload_file');
 const csvUpload = upload.single('csv');
-const { isValidDesease, getFileName, handleUploadFile, getPredictClass } = require('../lib/helper');
+const { isValidDesease, createFileName, handleUploadFile, getPredictClass } = require('../lib/helper');
 const { bodyName, csvFields } = require('../lib/helper_data');
 
 
@@ -58,7 +58,7 @@ router.post('/upload-csv', (req, res) => {
     } else {
       try {
         const clientCsvFilePath = path.resolve(__dirname, req.file.filename);
-        const resultCsvFileName = getFileName();
+        const resultCsvFileName = createFileName();
         const resultFilePath = path.resolve(__dirname, 'resultdata', resultCsvFileName);
 
         // read upload csv file, get predict for each record and then save data to file named resultCsvFileName

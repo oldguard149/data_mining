@@ -5,11 +5,13 @@
     <title>Home page</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/csv-upload.css" />
+    <link rel="stylesheet" href="/stylesheets/topnav.css">
 </head>
 
 <body>
     <div id="wrap">
-        <div id="form">
+        <%- include('topnav') %>
+        <div id="form-csv">
             <h2>Upload your csv file and get predict</h2>
             <% if ('undefined' !== typeof filesizeError && filesizeError) {%>
                 <div class="alert">
