@@ -5,6 +5,16 @@
     <title>Home page</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/topnav.css">
+
+    <style>
+        .btnDisable,
+        #form-container .btnDisable:hover {
+            cursor: not-allowed !important;
+            background-color: #D6D6D6 !important;
+            border: 1px solid #DAD3D3 !important;
+            color: #bfbfbf !important
+        }
+    </style>
 </head>
 
 <body>
@@ -361,14 +371,22 @@
                         </div>
                     </div>
 
+                    
 
                     <div class="submit-button">
-                        <input type="submit" value="Get Predict">
+                        <input id="submit-btn" type="submit" value="Get Predict"
+                        onclick="disableButton()">
                     </div>
                 </form>
             </div>
         </div>
-
+        <script>
+            function disableButton() {
+                var button = document.getElementById('submit-btn');
+                button.classList.add('btnDisable');
+                button.setAttribute("disabled", "disabled");
+            }
+        </script>
     </div>
 </body>
 
