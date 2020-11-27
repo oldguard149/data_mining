@@ -24,7 +24,7 @@
             <h2>Soybean desease diagnosis</h2>
             <p>You can also upload your csv file <a href="/upload-csv">here</a></p>
             <div id="form-container">
-                <form action="" method="POST">
+                <form action="" method="POST" onsubmit="disableButton()">
                     <div class="question">
                         <div>
                             <label for="date">Date:</label>
@@ -374,8 +374,7 @@
                     
 
                     <div class="submit-button">
-                        <input id="submit-btn" type="submit" value="Get Predict"
-                        onclick="disableButton()">
+                        <input id="submit-btn" type="submit" value="Get Predict">
                     </div>
                 </form>
             </div>
